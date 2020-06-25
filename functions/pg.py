@@ -2,6 +2,7 @@ import asyncio
 import asyncpg
 
 lock = asyncio.Lock()
+db = None
 
 
 async def connect():

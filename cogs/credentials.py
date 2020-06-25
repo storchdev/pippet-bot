@@ -80,18 +80,19 @@ class Credentials(commands.Cog):
 
         password = message.content
 
-        captcha, letters = '', '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.join(' ').split()
+        captcha, letters = '', ' '.join('123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ').split()
 
         for i in range(5):
             captcha += random.choice(letters)
 
         image = ImageCaptcha()
-        image.write(f'captcha', f'./{ctx.author.id}.png')
+        image.write(captcha, f'./{ctx.author.id}.png')
         file = discord.File(f'./{ctx.author.id}.png')
-        os.remove(f'./{ctx.author.id}.png')
 
         await ctx.author.send('You have 30 seconds to complete the CAPTCHA below to prove that you are human. '
                               'Case does not matter.', file=file)
+
+        os.remove(f'./{ctx.author.id}.png')
 
         try:
             message = await self.bot.wait_for('message', timeout=30, check=check)
@@ -105,7 +106,9 @@ class Credentials(commands.Cog):
 
         query = 'INSERT INTO credentials (username, password, in_game) VALUES ($1, $2, $3)'
         await pg.execute(query, (username, password, False))
-        query = 'INSERT INTO players (username, location, gender'
+        query = 'INSERT INTO players (username, location, stars, hearts, currency, backpack, pets, equipped, ' \
+                'is_new) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)'
+        await pg.execute(query, (username, 'A', 0, 530, '{}', '{}', '{}', '{}', True))
         yes = self.bot.gifs['yes']
         await ctx.author.send(f'{yes} Success! Your account `{username}` was created. '
                               f'Do `{ctx.prefix}login` to login again.')

@@ -20,6 +20,9 @@ async def get_prefix(x, message):
             return prefixes
         else:
             return ['pmp ', 'PMP ', 'Pmp ']
+    else:
+        return ''
+
 
 bot = commands.Bot(command_prefix=get_prefix)
 exts = ['cogs.credentials', 'cogs.config']
