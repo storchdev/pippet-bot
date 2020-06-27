@@ -36,6 +36,11 @@ async def on_ready():
     print('Ready')
 
 
+@bot.command(aliases=['code', 'src'])
+async def github(ctx):
+    await ctx.send('https://github.com/Stormtorch002/pippet-bot')
+
+
 @bot.command(hidden=True)
 @commands.check(restricted)
 async def reboot(ctx):
