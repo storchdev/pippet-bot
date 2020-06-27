@@ -4,6 +4,8 @@ import random
 import discord
 from discord.ext import commands
 from captcha.image import ImageCaptcha
+from PIL import Image
+from io import BytesIO
 from functions import pg
 
 
@@ -85,14 +87,29 @@ class Credentials(commands.Cog):
         for i in range(5):
             captcha += random.choice(letters)
 
-        image = ImageCaptcha()
-        image.write(captcha, f'./{ctx.author.id}.png')
-        file = discord.File(f'./{ctx.author.id}.png')
+        try:
+            image = ImageCaptcha()
+            buffer = BytesIO()
+            image.write(captcha, buffer)
+            buffer.seek(0)
 
-        await ctx.author.send('You have 30 seconds to complete the CAPTCHA below to prove that you are human. '
-                              'Case does not matter.', file=file)
+            def expand_captcha():
+                with Image.open(buffer) as captcha_image:
+                    captcha_image = captcha_image.resize(size=(captcha_image.size[0] * 3, captcha_image.size[1] * 3))
+                    captcha_buffer = BytesIO()
+                    captcha_image.save(captcha_buffer, 'png')
+                    captcha_buffer.seek(0)
 
-        os.remove(f'./{ctx.author.id}.png')
+                    return captcha_buffer
+
+            loop = asyncio.get_event_loop()
+            buffer = await loop.run_in_executor(None, expand_captcha)
+            file = discord.File(buffer, filename="captcha.png")
+            description = 'You have 30 seconds to complete the CAPTCHA below to prove that you are human. ' \
+                          'Case does not matter.'
+            await ctx.author.send(description, file=file)
+        except Exception as error:
+            await ctx.author.send(error)
 
         try:
             message = await self.bot.wait_for('message', timeout=30, check=check)
