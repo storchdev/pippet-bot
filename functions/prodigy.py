@@ -1,8 +1,8 @@
-from PIL import Image, ImageDraw, ImageFont
-from io import BytesIO
-import textwrap
 import os
 import random
+import textwrap
+from io import BytesIO
+from PIL import Image, ImageDraw, ImageFont, ImageEnhance
 
 
 def get_stars(level: int):
@@ -40,16 +40,56 @@ def noot(image, noot_face, text, footer=None):
         y += 45
 
     pasted = (0, image.size[1] - noot_image.size[1])
-    image.paste(noot_image, pasted, noot_image)
+    new_image = image.copy()
+    new_image.paste(noot_image, pasted, noot_image)
 
     if footer is not None:
-        draw = ImageDraw.Draw(image)
+        draw = ImageDraw.Draw(new_image)
         font = ImageFont.truetype('./resources/fonts/abeezee.ttf', 20)
         x = 900 - font.getsize(footer)[0]
-        draw.text((x, image.size[1] - 40), footer, font=font, fill=(0, 0, 0))
+        draw.text((x, new_image.size[1] - 40), footer, font=font, fill=(0, 0, 0))
 
     output_buffer = BytesIO()
-    image.save(output_buffer, "png")
+    new_image.save(output_buffer, "png")
     output_buffer.seek(0)
 
     return output_buffer
+
+
+def new_item(rarity, path, text):
+    background = Image.open(path)
+    enhancer = ImageEnhance.Brightness(background)
+    background = enhancer.enhance(0.2)
+
+    rarity_card = Image.open(f'./resources/rarity_cards/{rarity}.png')
+
+    lines = textwrap.wrap(text, width=14)
+    y = 20 if len(lines) > 1 else 35
+    font = ImageFont.truetype('./resources/fonts/allerta.ttf', 40)
+    draw = ImageDraw.Draw(rarity_card)
+    center = rarity_card.size[0] / 2
+
+    for line in lines:
+        size = font.getsize(line)[0] / 2
+        x = round(center - size)
+        draw.text(xy=(x, y), text=line, fill=(0, 0, 0), font=font)
+
+    y = round(background.size[1] / 3)
+    x = round(rarity_card.size[0] * background.size[1] / rarity_card.size[1] / 3)
+    rarity_card = rarity_card.resize(size=(x, y))
+
+    pet_image = Image.open(f'./resources/pets/Dragic.png')
+    mask = pet_image.convert(mode='RGBA').split()[3]
+
+    center_x, center_y = round(rarity_card.size[0] / 2), round(rarity_card.size[1] / 2)
+    size_x, size_y = round(pet_image.size[0] / 2), round(pet_image.size[1] / 2)
+    x, y = center_x - size_x, center_y - size_y
+    rarity_card.paste(pet_image, (x, y), mask)
+    mask = rarity_card.convert(mode='RGBA').split()[3]
+
+    center = round(background.size[0] / 2)
+    size = round(rarity_card.size[0] / 2)
+    x, y = center - size, 100
+    background.paste(rarity_card, (x, y), mask)
+
+    return background
