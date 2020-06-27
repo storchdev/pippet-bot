@@ -56,7 +56,7 @@ def noot(image, noot_face, text, footer=None):
     return output_buffer
 
 
-def new_item(rarity, path, text):
+def new_item(rarity, path, item_path, text):
     background = Image.open(path)
     enhancer = ImageEnhance.Brightness(background)
     background = enhancer.enhance(0.2)
@@ -78,7 +78,7 @@ def new_item(rarity, path, text):
     x = round(rarity_card.size[0] * background.size[1] / rarity_card.size[1] / 3)
     rarity_card = rarity_card.resize(size=(x, y))
 
-    pet_image = Image.open(f'./resources/pets/Dragic.png')
+    pet_image = Image.open(item_path)
     mask = pet_image.convert(mode='RGBA').split()[3]
 
     center_x, center_y = round(rarity_card.size[0] / 2), round(rarity_card.size[1] / 2)
