@@ -123,7 +123,8 @@ class Game(commands.Cog):
                 await pg.execute(query, (pets, False, username))
 
                 background = await loop.run_in_executor(None, prodigy.new_item, 'common',
-                                                        './resources/areas/starters.png', pet)
+                                                        './resources/areas/starters.png',
+                                                        f'./resources/pets/{pet}.png')
                 buffer = await loop.run_in_executor(None, prodigy.noot, background, '4', 'You got your first pet!',
                                                     f'Type "{ctx.prefix}travel B" in chat to continue to next area.')
 
@@ -174,13 +175,13 @@ class Game(commands.Cog):
                         f = f[0]
                         break
 
-            query = 'UPDATE players SET location = $1 WHERE username = $2'
-            await pg.execute(query, (location.upper(), row['username']))
-
             if f:
                 await ctx.send(file=discord.File(f))
             else:
                 await ctx.send('Uh oh... you cannot reach that location now!')
+
+            query = 'UPDATE players SET location = $1 WHERE username = $2'
+            await pg.execute(query, (location.upper(), row['username']))
 
         except Exception as e:
             await ctx.send(e)
