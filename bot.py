@@ -81,7 +81,7 @@ async def reboot(ctx):
 
 
 @bot.command(hidden=True)
-@commands.check(restricted)
+@commands.check(only_devs)
 async def database(ctx, *, query):
 
     try:
