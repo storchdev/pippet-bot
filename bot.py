@@ -1,10 +1,11 @@
+import asyncio
 import discord
 from discord.ext import commands
 from functions import pg
 from functions import prodigy
 
 
-def restricted(ctx):
+def only_devs(ctx):
     return ctx.author.id in [576187414033334282, 571881373523247105, 470595952210739200]
 
 
@@ -36,13 +37,40 @@ async def on_ready():
     print('Ready')
 
 
+@bot.event
+async def on_message(message):
+
+    if message.author.id in [571881373523247105] and message.channel.id == 705106349922582529 and \
+            message.content.lower() == '!work':
+        await asyncio.sleep(60)
+        channel = bot.get_channel(726442490130989127)
+        await channel.send(f'{message.author.mention}, time to do `!work`. <#705106349922582529>')
+
+    if message.author.id == 721146077700685834 and message.content[0].isdigit():
+        lines = message.content
+        spells = {}
+
+        try:
+            import json
+
+            for line in lines.lower().replace('’', "'").splitlines():
+                level, slot, spell = int(line.split()[0]), int(line.split()[1]), line.split(None, 2)[2]
+                spells[spell] = [level, slot]
+
+            await message.channel.send(f'```json\n{json.dumps(spells)}\n```')
+        except ValueError:
+            pass
+
+    await bot.process_commands(message)
+
+
 @bot.command(aliases=['code', 'src'])
 async def github(ctx):
     await ctx.send('https://github.com/Stormtorch002/pippet-bot')
 
 
 @bot.command(hidden=True)
-@commands.check(restricted)
+@commands.check(only_devs)
 async def reboot(ctx):
 
     for a in exts:
