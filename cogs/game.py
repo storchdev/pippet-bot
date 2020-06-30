@@ -5,6 +5,7 @@ import os
 import discord
 from discord.ext import commands
 from functions import pg, prodigy
+from functions.format_exception import error
 from PIL import Image
 
 
@@ -122,11 +123,10 @@ class Game(commands.Cog):
                 query = 'UPDATE players SET pets = $1, is_new = $2 WHERE username = $3'
                 await pg.execute(query, (pets, False, username))
 
-                background = await loop.run_in_executor(None, prodigy.new_item, 'common',
-                                                        './resources/areas/starters.png',
-                                                        f'./resources/pets/{pet}.png')
-                buffer = await loop.run_in_executor(None, prodigy.noot, background, '4', 'You got your first pet!',
-                                                    f'Type "{ctx.prefix}travel B" in chat to continue to next area.')
+                buffer = await loop.run_in_executor(None, prodigy.new_item, 'common',
+                                                    './resources/areas/starters.png',
+                                                    f'./resources/pets/{pet}.png', pet,
+                                                    'You got your first pet!')
 
                 await ctx.send(file=discord.File(fp=buffer, filename='end.png'))
             else:
@@ -139,9 +139,8 @@ class Game(commands.Cog):
 
                 if f:
                     await ctx.send(file=discord.File(f))
-
-        except Exception as error:
-            await ctx.send(error)
+        except:
+            error()
 
     @commands.command()
     async def travel(self, ctx, location):
@@ -176,16 +175,20 @@ class Game(commands.Cog):
                         break
 
             if f:
+
+                if location.upper() in ['R', 'T']:
+                    await prodigy.spin_wheel(ctx, self.bot, in_game['username'])
+                    return
+
                 await ctx.send(file=discord.File(f))
             else:
                 await ctx.send('Uh oh... you cannot reach that location now!')
+                return
 
             query = 'UPDATE players SET location = $1 WHERE username = $2'
             await pg.execute(query, (location.upper(), row['username']))
-
-        except Exception as e:
-            await ctx.send(e)
-
+        except:
+            error()
 
 def setup(bot):
     bot.add_cog(Game(bot))
