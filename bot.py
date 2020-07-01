@@ -1,4 +1,5 @@
 import asyncio
+import re
 import discord
 from discord.ext import commands
 from functions import pg
@@ -26,7 +27,7 @@ async def get_prefix(x, message):
 
 
 bot = commands.Bot(command_prefix=get_prefix)
-exts = ['cogs.credentials', 'cogs.config', 'cogs.game']
+exts = ['cogs.credentials', 'cogs.config', 'cogs.game', 'cogs.messages']
 
 
 @bot.event
