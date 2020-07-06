@@ -104,8 +104,11 @@ class Messages(commands.Cog):
 
         content, author_id, time = message['content'], message['author_id'], \
         datetime.fromtimestamp(message['timestamp'])
+        channel_id, guild_id, message_id = message['channel_id'], message['guild_id'], message['message_id']
 
         member = ctx.guild.get_member(author_id)
+        jump_url = f'https://discordapp.com/channels/{guild_id}/{channel_id}/{message_id}'
+        content = f'{content}\n\n[Jump to Message]({jump_url})'
 
         if member is None:
             embed = discord.Embed(description=content, timestamp=time)
@@ -115,6 +118,7 @@ class Messages(commands.Cog):
             embed = discord.Embed(color=member.color, description=content, timestamp=time)
             embed.set_author(name=str(member), icon_url=member.avatar_url_as(format=fmt))
 
+        embed.set_footer(text='Message Sent At -->')
         await ctx.send(embed=embed)
 
 
