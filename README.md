@@ -23,7 +23,7 @@ pmp prefix <new prefix>
 ```
 ## Calculations
 
-The level of a wizard is calculated from the number of stars the wizard has. The following function represents the conversion, where *x* is the number of stars a wizard has and *f(x)* is the level:
+The level of a wizard is calculated from the number of stars the wizard has. The following function represents the conversion, where *x* is the number of stars a wizard has and *f(x)* is the level: **Note that this conversion is only accurate to the real Prodigy game up to 10 wizard levels. Pippet's version gets heavily nerfed from level 50 and up.**
 ```
 f(x) = floor(0.00000000183x³ - 0.0000152x² + 0.0454x + 1.72)
 ```
