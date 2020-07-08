@@ -6,6 +6,7 @@ A Discord bot used to simulate the online math game Prodigy.
 ## Pippet is Exclusive to the Following Discord Servers:
 - [Camden Bell Official](https://discord.gg/zuEvEUc)
 - [SLounge](https://discord.gg/QqecbRm)
+- [Chief's Chat](https://discord.gg/CeX9kq4)
 - [Pippet Support](https://discord.gg/uDk7WSa)
 
 ## Basic Commands
